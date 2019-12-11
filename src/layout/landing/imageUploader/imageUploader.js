@@ -12,6 +12,13 @@ const styles = theme => ({
   },
   err: {
     color: "red"
+  },
+  predict: {
+    // width: "400px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: "40px"
   }
 });
 
@@ -19,7 +26,9 @@ class UploadButtons extends Component {
   state = {
     image: null,
     file: null,
-    imgError: ""
+    imgError: "",
+
+    predictions: []
   };
 
   imgChangedHandler = event => {
@@ -43,14 +52,16 @@ class UploadButtons extends Component {
     if (imgError === "" && file !== null) {
       let formData = new FormData(); // Currently empty
       formData.append("image", image);
-      formData.append("name", "abdul");
 
       console.log("api hit");
 
       axios
-        .post("https://attention-ocr-api.herokuapp.com/api/", formData)
+        .post("https://attention-ocr.herokuapp.com/upload", formData)
         .then(res => {
-          console.log("res", res);
+          console.log("res from API::", res.data);
+          this.setState({
+            predictions: res.data.text.predictions
+          });
         });
     } else {
       return this.setState({
@@ -62,17 +73,28 @@ class UploadButtons extends Component {
   render() {
     const { classes } = this.props;
     const { file } = this.state;
+    const { predictions } = this.state;
 
     console.log("this.state", this.state);
 
     return (
       <div className={classes.root}>
-        <img
-          src={file !== null ? file : "https://via.placeholder.com/250"}
-          height="250px"
-          width="250px"
-          alt="selector"
-        ></img>{" "}
+        <div className={classes.predict}>
+          <img
+            src={file !== null ? file : "https://via.placeholder.com/250"}
+            height="250px"
+            width="250px"
+            alt="selector"
+          ></img>
+          {predictions && predictions[0] ? (
+            <div>
+              <Typography variant="h6">
+                Prediction: {predictions[0].confidence}{" "}
+              </Typography>
+              <Typography variant="h6"> OCR: {predictions[0].ocr} </Typography>
+            </div>
+          ) : null}
+        </div>
         <br></br>
         <input
           accept="image/*"
