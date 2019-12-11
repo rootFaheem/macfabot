@@ -53,12 +53,10 @@ class UploadButtons extends Component {
       let formData = new FormData(); // Currently empty
       formData.append("image", image);
 
-      console.log("api hit");
-
       axios
         .post("https://attention-ocr.herokuapp.com/upload", formData)
         .then(res => {
-          console.log("res from API::", res.data);
+          console.log("res: ", res.data);
           this.setState({
             predictions: res.data.text.predictions
           });
@@ -75,8 +73,6 @@ class UploadButtons extends Component {
     const { file } = this.state;
     const { predictions } = this.state;
 
-    console.log("this.state", this.state);
-
     return (
       <div className={classes.root}>
         <div className={classes.predict}>
@@ -87,11 +83,11 @@ class UploadButtons extends Component {
             alt="selector"
           ></img>
           {predictions && predictions[0] ? (
-            <div>
+            <div style={{ marginLeft: "20px" }}>
+              <Typography variant="h6"> Text: {predictions[0].ocr} </Typography>
               <Typography variant="h6">
-                Prediction: {predictions[0].confidence}{" "}
+                Confidence: {predictions[0].confidence}{" "}
               </Typography>
-              <Typography variant="h6"> OCR: {predictions[0].ocr} </Typography>
             </div>
           ) : null}
         </div>
